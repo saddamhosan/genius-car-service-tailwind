@@ -1,15 +1,33 @@
 import React, { useState } from "react";
-import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  useAuthState, useSignInWithEmailAndPassword,
+  useSignInWithFacebook,
+  useSignInWithGithub,
+  useSignInWithGoogle
+} from "react-firebase-hooks/auth";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import auth from "../firebase.init";
 
 const Login = () => {
     const [email,setEmail]=useState('')
     const [password,setPassword]=useState('')
     const navigate=useNavigate()
+    const location=useLocation()
+    const from=location?.state?.from?.pathname||'/'
 
-    const [signInWithEmailAndPassword, user, loading, error] =
+    const [signInWithEmailAndPassword] =
       useSignInWithEmailAndPassword(auth);
+
+      const [signInWithGoogle] =
+        useSignInWithGoogle(auth);
+
+        const [signInWithGithub] =
+          useSignInWithGithub(auth);
+
+          const [signInWithFacebook] =
+            useSignInWithFacebook(auth);
+
+  const [user, loading, error] = useAuthState(auth);
 
     const handleEmail=(e)=>{
         setEmail(e.target.value)
@@ -23,8 +41,20 @@ const Login = () => {
         signInWithEmailAndPassword(email,password)
     } 
 
+    const handleGoogleSignIn=()=>{
+     signInWithGoogle();
+    }
+
+    const handleGithubSignIn=()=>{
+      signInWithGithub()
+    }
+
+    const handleFacebookSignIn=()=>{
+      signInWithFacebook()
+    }
+
     if(user){
-        navigate('/')
+        navigate(from,{replace:true})
     }
 
   return (
@@ -66,14 +96,29 @@ const Login = () => {
         </div>
       </form>
       <p>
-        First time on the car doctor?{" "}
+        First time on the car doctor?
         <Link className="text-orange-600" to="/register">
           Create account
         </Link>
       </p>
       <p className="text-center">Or</p>
-      <button className="border-2 rounded-xl w-full text-xl py-2">
+      <button
+        onClick={handleGoogleSignIn}
+        className="border-2 rounded-xl w-full text-xl py-2"
+      >
         Login with google
+      </button>
+      <button
+        onClick={handleGithubSignIn}
+        className="border-2 rounded-xl w-full text-xl py-2 mt-2"
+      >
+        Login with gitHub
+      </button>
+      <button
+        onClick={handleFacebookSignIn}
+        className="border-2 rounded-xl w-full text-xl py-2 mt-2"
+      >
+        Login with Facebook
       </button>
     </div>
   );
