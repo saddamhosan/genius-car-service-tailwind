@@ -5,6 +5,7 @@ import Home from "./Component/Home/Home";
 import Login from "./Component/Login";
 import Register from "./Component/Register";
 import RequireAuth from "./Component/RequireAuth";
+import ServiceDetail from "./Component/ServiceDetail";
 import Footer from "./Component/Shared/Footer";
 import Header from "./Component/Shared/Header";
 
@@ -14,6 +15,7 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/service/:id" element={<ServiceDetail />} />
         <Route
           path="/about"
           element={

@@ -1,7 +1,11 @@
-import React, { useState } from "react";
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
+import React, { useEffect, useState } from "react";
+import {
+  useAuthState,
+  useCreateUserWithEmailAndPassword,
+  useUpdateProfile
+} from "react-firebase-hooks/auth";
 import { Link, useNavigate } from "react-router-dom";
-import auth from './../firebase.init';
+import auth from "./../firebase.init";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -10,10 +14,14 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [mistake, setMistake] = useState("");
 
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
-  const [createUserWithEmailAndPassword, user, loading, error] =
+  const [createUserWithEmailAndPassword, ,loading, error] =
     useCreateUserWithEmailAndPassword(auth);
+
+  const [updateProfile] = useUpdateProfile(auth);
+  
+  const [user] = useAuthState(auth);
 
   const handleName = (e) => {
     setName(e.target.value);
@@ -29,18 +37,26 @@ const Register = () => {
   };
 
   const handleSubmit = (e) => {
-      setMistake('')
+    setMistake("");
     e.preventDefault();
-    if(password!==confirmPassword){
-        setMistake('two password not match')
-        return
+    if (password !== confirmPassword) {
+      setMistake("two password not match");
+      return;
     }
-    createUserWithEmailAndPassword(email,password)
+    createUserWithEmailAndPassword(email, password);
+    console.log(name)
+    updateProfile({ displayName: name });
   };
-
-  if (user) {
-    navigate("/");
-  }
+  useEffect(()=>{
+console.log(user);
+if (user?.uid) {
+  navigate("/");
+}
+if (user?.uid) {
+  updateProfile({ displayName: name });
+}
+  },[user])
+  
   return (
     <div className="w-1/3 mx-auto border-2 my-5 p-10 rounded-xl">
       <form onSubmit={handleSubmit}>
