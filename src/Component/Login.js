@@ -1,12 +1,17 @@
 import React, { useState } from "react";
 import {
-  useAuthState, useSignInWithEmailAndPassword,
+  useSendPasswordResetEmail,
+  useSignInWithEmailAndPassword,
   useSignInWithFacebook,
   useSignInWithGithub,
   useSignInWithGoogle
 } from "react-firebase-hooks/auth";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import auth from "../firebase.init";
+import Spinners from "./Spinners";
+
 
 const Login = () => {
     const [email,setEmail]=useState('')
@@ -15,19 +20,20 @@ const Login = () => {
     const location=useLocation()
     const from=location?.state?.from?.pathname||'/'
 
-    const [signInWithEmailAndPassword] =
+    const [signInWithEmailAndPassword, user, loading, error] =
       useSignInWithEmailAndPassword(auth);
 
-      const [signInWithGoogle] =
+      const [signInWithGoogle, GgUser, GgLoading, GgError] =
         useSignInWithGoogle(auth);
 
-        const [signInWithGithub] =
+        const [signInWithGithub, GhUser, GhLoading, GhError] =
           useSignInWithGithub(auth);
 
-          const [signInWithFacebook] =
+          const [signInWithFacebook, FBUser, FBLoading, FBError] =
             useSignInWithFacebook(auth);
 
-  const [user, loading, error] = useAuthState(auth);
+   const [sendPasswordResetEmail, sending,  ResetPassError] =
+     useSendPasswordResetEmail(auth);
 
     const handleEmail=(e)=>{
         setEmail(e.target.value)
@@ -36,25 +42,32 @@ const Login = () => {
         setPassword(e.target.value)
     }
 
-    const handleSubmit=(e)=>{
+    const handleSubmit=async(e)=>{
         e.preventDefault()
-        signInWithEmailAndPassword(email,password)
+       await signInWithEmailAndPassword(email,password)
     } 
 
-    const handleGoogleSignIn=()=>{
-     signInWithGoogle();
+    const handleGoogleSignIn=async()=>{
+     await signInWithGoogle();
     }
 
-    const handleGithubSignIn=()=>{
-      signInWithGithub()
+    const handleGithubSignIn=async()=>{
+     await signInWithGithub()
     }
 
-    const handleFacebookSignIn=()=>{
-      signInWithFacebook()
+    const handleFacebookSignIn= async()=>{
+     await signInWithFacebook()
     }
+   
+    const handleResetPassword=()=>{
+      sendPasswordResetEmail(email)
+      toast('sent email')
+    }
+    
+    
 
-    if(user){
-        navigate(from,{replace:true})
+    if (user || FBUser || GhUser || GgUser) {
+      navigate(from, { replace: true });
     }
 
   return (
@@ -85,8 +98,20 @@ const Login = () => {
             id=""
           />
         </div>
-        {loading && <p className="text-blue-600">loading...</p>}
-        {error && <p className="text-red-600">{error.message}</p>}
+
+        {(loading || FBLoading || GhLoading || GgLoading || sending) && (
+          <p>
+            <Spinners />
+          </p>
+        )}
+
+        {(error || FBError || GhError || GgError) && (
+          <p className="text-red-600">
+            Error: {error?.message} {GgError?.message} {FBError?.message}
+            {GhError?.message}
+          </p>
+        )}
+
         <div className="flex justify-center">
           <input
             className="bg-blue-600 text-xl font-bold px-5 py-2 text-white rounded-xl mt-2"
@@ -101,7 +126,20 @@ const Login = () => {
           Create account
         </Link>
       </p>
-      <p className="text-center">Or</p>
+      <p className="mt-2">
+        forget password?
+        <span
+          onClick={handleResetPassword}
+          className="text-blue-600 cursor-pointer"
+        >
+          reset password
+        </span>
+      </p>
+      <div className="flex items-center">
+        <div className="bg-gray-500 h-[1px] w-full"></div>
+        <p className="text-center mx-4 ">Or</p>
+        <div className="bg-gray-500 h-[1px] w-full"></div>
+      </div>
       <button
         onClick={handleGoogleSignIn}
         className="border-2 rounded-xl w-full text-xl py-2"
@@ -120,6 +158,7 @@ const Login = () => {
       >
         Login with Facebook
       </button>
+      <ToastContainer />
     </div>
   );
 };

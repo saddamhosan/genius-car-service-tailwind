@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
-  useAuthState,
   useCreateUserWithEmailAndPassword,
   useUpdateProfile
 } from "react-firebase-hooks/auth";
 import { Link, useNavigate } from "react-router-dom";
 import auth from "./../firebase.init";
+import Spinners from "./Spinners";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -16,12 +16,12 @@ const Register = () => {
 
   const navigate = useNavigate();
 
-  const [createUserWithEmailAndPassword, ,loading, error] =
-    useCreateUserWithEmailAndPassword(auth);
+  const [createUserWithEmailAndPassword, user, loading, error] =
+  useCreateUserWithEmailAndPassword(auth ,{sendEmailVerification:true});
 
-  const [updateProfile] = useUpdateProfile(auth);
+  const [updateProfile, updating, updateError] = useUpdateProfile(auth);
   
-  const [user] = useAuthState(auth);
+  // const [user] = useAuthState(auth);
 
   const handleName = (e) => {
     setName(e.target.value);
@@ -35,27 +35,23 @@ const Register = () => {
   const handleConfirmPassword = (e) => {
     setConfirmPassword(e.target.value);
   };
+  if(updating||loading){
+    return <Spinners/>
+  }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     setMistake("");
     e.preventDefault();
     if (password !== confirmPassword) {
       setMistake("two password not match");
       return;
     }
-    createUserWithEmailAndPassword(email, password);
-    console.log(name)
-    updateProfile({ displayName: name });
+   await createUserWithEmailAndPassword(email, password);
+   await updateProfile({ displayName: name });
+    navigate("/");
   };
-  useEffect(()=>{
-console.log(user);
-if (user?.uid) {
-  navigate("/");
-}
-if (user?.uid) {
-  updateProfile({ displayName: name });
-}
-  },[user])
+  console.log(user);
+
   
   return (
     <div className="w-1/3 mx-auto border-2 my-5 p-10 rounded-xl">
@@ -110,7 +106,7 @@ if (user?.uid) {
           />
         </div>
         <p className="text-red-600">{mistake}</p>
-        {loading && <p className="text-blue-600">loading...</p>}
+        {/* {loading && <p className="text-blue-600">loading...</p>} */}
         {error && <p className="text-red-600">{error.message}</p>}
         <div className="flex justify-center">
           <input

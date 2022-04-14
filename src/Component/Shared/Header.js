@@ -5,10 +5,14 @@ import ResponsiveMenu from 'react-responsive-navbar';
 import { NavLink } from 'react-router-dom';
 import auth from '../../firebase.init';
 import logo from '../../images/logo.png';
+import Spinners from '../Spinners';
 
 
 const Header = () => {
-   const [user] = useAuthState(auth);
+   const [user, loading, error] = useAuthState(auth);
+   if(loading){
+     return <Spinners/>
+   }
   
     return (
       <ResponsiveMenu
@@ -48,7 +52,7 @@ const Header = () => {
                  Log Out
                </button>
                <span className="text-blue-900 ml-5 font-bold">
-                 {user?.displayName}
+                 {user.displayName}
                </span>
              </span>
            ) : (
