@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 
 const Service = ({ service  }) => {
+  console.log(service)
   const { price, name, img, description } = service;
   const navigate = useNavigate();
   const handleBookService = (id) => {
@@ -11,6 +12,7 @@ const Service = ({ service  }) => {
 
   return (
     <div>
+      
       <div>
         <img className="w-full" src={img} alt="" />
       </div>
@@ -19,7 +21,7 @@ const Service = ({ service  }) => {
         <h4>{price}</h4>
         <p>{description}</p>
         <button
-          onClick={() => handleBookService(service.id)}
+          onClick={() => handleBookService(service._id)}
           className="bg-blue-500 text-xl px-8 py-2 rounded-xl mt-2"
         >
           Book This service

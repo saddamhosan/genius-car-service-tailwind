@@ -1,20 +1,54 @@
-import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import useServices from '../Hooks/useServices';
-
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 const ServiceDetail = () => {
-  const navigate=useNavigate()
+  const navigate = useNavigate();
   const { id } = useParams();
-   const [services] = useServices();
-   
-   const service = services.find((service) => service.id === +id);
-    
+  //  const [services] = useServices();
+  //  const service = services.find((service) => service._id === id);
+  const [service, setService] = useState({});
+  console.log(service);
+  useEffect(() => {
+    const url = `http://localhost:5000/services/${id}`;
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        setService(data);
+      });
+  }, [id]);
+
+  const handleDeleteServices = (id) => {
+    const proceed = window.confirm("are you sure you want to delete");
+    if (proceed) {
+      fetch(`http://localhost:5000/services/${id}`, {
+        method: "DELETE",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if(data.deletedCount>0){
+            alert('delete successful')
+            navigate('/')
+          }
+        });
+    }
+  };
   return (
     <div>
-      <button onClick={()=>navigate('/')} className="bg-blue-500 text-xl px-8 py-2 rounded-xl mt-6 ml-6">
-        Back
-      </button>
+      <div className="flex justify-between mx-10 mt-6">
+        <button
+          onClick={() => navigate("/")}
+          className="bg-blue-500 text-xl px-8 py-2 rounded-xl "
+        >
+          Back
+        </button>
+
+        <button
+          onClick={() => handleDeleteServices(service._id)}
+          className="bg-red-500 text-xl px-8 py-2 rounded-xl "
+        >
+          Delate
+        </button>
+      </div>
       <div className="w-1/2 mx-auto mt-12">
         <div>
           <img className="w-full" src={service?.img} alt="" />

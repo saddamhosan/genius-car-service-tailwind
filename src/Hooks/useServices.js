@@ -3,9 +3,7 @@ import { useEffect, useState } from "react";
 const useServices = () => {
   const [services, setServices] = useState([]);
   useEffect(() => {
-    fetch(
-      "https://raw.githubusercontent.com/saddamhosan/genius-car-service-tailwind-fake-data/main/service.json"
-    )
+    fetch("http://localhost:5000/services")
       .then((res) => res.json())
       .then((data) => setServices(data));
   }, []);
