@@ -1,21 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import useServiceDetail from './../Hooks/useServiceDetail';
 
 const ServiceDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  //  const [services] = useServices();
-  //  const service = services.find((service) => service._id === id);
-  const [service, setService] = useState({});
-  console.log(service);
-  useEffect(() => {
-    const url = `http://localhost:5000/services/${id}`;
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
-        setService(data);
-      });
-  }, [id]);
+
+  const [service]=useServiceDetail(id)
 
   const handleDeleteServices = (id) => {
     const proceed = window.confirm("are you sure you want to delete");
@@ -57,6 +48,7 @@ const ServiceDetail = () => {
           <h1>{service?.name}</h1>
           <h4>{service?.price}</h4>
           <p>{service?.description}</p>
+          <button onClick={()=>navigate(`/checkout/${id}`)} className="bg-blue-600 text-white text-xl px-6 py-3 mt-4 rounded-xl">Proceed Checkout</button>
         </div>
       </div>
     </div>
