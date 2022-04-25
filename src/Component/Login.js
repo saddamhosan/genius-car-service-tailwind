@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState } from "react";
 import {
   useSendPasswordResetEmail,
@@ -12,63 +13,64 @@ import "react-toastify/dist/ReactToastify.css";
 import auth from "../firebase.init";
 import Spinners from "./Spinners";
 
-
 const Login = () => {
-    const [email,setEmail]=useState('')
-    const [password,setPassword]=useState('')
-    const navigate=useNavigate()
-    const location=useLocation()
-    const from=location?.state?.from?.pathname||'/'
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location?.state?.from?.pathname || "/";
 
-    const [signInWithEmailAndPassword, user, loading, error] =
-      useSignInWithEmailAndPassword(auth);
+  const [signInWithEmailAndPassword, user, loading, error] =
+    useSignInWithEmailAndPassword(auth);
 
-      const [signInWithGoogle, GgUser, GgLoading, GgError] =
-        useSignInWithGoogle(auth);
+  const [signInWithGoogle, GgUser, GgLoading, GgError] =
+    useSignInWithGoogle(auth);
 
-        const [signInWithGithub, GhUser, GhLoading, GhError] =
-          useSignInWithGithub(auth);
+  const [signInWithGithub, GhUser, GhLoading, GhError] =
+    useSignInWithGithub(auth);
 
-          const [signInWithFacebook, FBUser, FBLoading, FBError] =
-            useSignInWithFacebook(auth);
+  const [signInWithFacebook, FBUser, FBLoading, FBError] =
+    useSignInWithFacebook(auth);
 
-   const [sendPasswordResetEmail, sending,  ResetPassError] =
-     useSendPasswordResetEmail(auth);
+  const [sendPasswordResetEmail, sending, ResetPassError] =
+    useSendPasswordResetEmail(auth);
 
-    const handleEmail=(e)=>{
-        setEmail(e.target.value)
-    }
-    const handlePassword=(e)=>{
-        setPassword(e.target.value)
-    }
+  const handleEmail = (e) => {
+    setEmail(e.target.value);
+  };
+  const handlePassword = (e) => {
+    setPassword(e.target.value);
+  };
 
-    const handleSubmit=async(e)=>{
-        e.preventDefault()
-       await signInWithEmailAndPassword(email,password)
-    } 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await signInWithEmailAndPassword(email, password);
+    const { data } = await axios.post("http://localhost:5000/login", { email });
+    console.log(data);
+    localStorage.setItem("accessToken", data.accessToken);
+    navigate(from, { replace: true });
+  };
 
-    const handleGoogleSignIn=async()=>{
-     await signInWithGoogle();
-    }
+  const handleGoogleSignIn = async () => {
+    await signInWithGoogle();
+  };
 
-    const handleGithubSignIn=async()=>{
-     await signInWithGithub()
-    }
+  const handleGithubSignIn = async () => {
+    await signInWithGithub();
+  };
 
-    const handleFacebookSignIn= async()=>{
-     await signInWithFacebook()
-    }
-   
-    const handleResetPassword=()=>{
-      sendPasswordResetEmail(email)
-      toast('sent email')
-    }
-    
-    
+  const handleFacebookSignIn = async () => {
+    await signInWithFacebook();
+  };
 
-    if (user || FBUser || GhUser || GgUser) {
-      navigate(from, { replace: true });
-    }
+  const handleResetPassword = () => {
+    sendPasswordResetEmail(email);
+    toast("sent email");
+  };
+
+  if (FBUser || GhUser || GgUser) {
+    navigate(from, { replace: true });
+  }
 
   return (
     <div className="w-1/3 mx-auto border-2 my-5 p-10 rounded-xl">
@@ -105,10 +107,10 @@ const Login = () => {
           </p>
         )}
 
-        {(error || FBError || GhError || GgError) && (
+        {(error || FBError || GhError || GgError || ResetPassError) && (
           <p className="text-red-600">
             Error: {error?.message} {GgError?.message} {FBError?.message}
-            {GhError?.message}
+            {GhError?.message} {ResetPassError?.message}
           </p>
         )}
 
@@ -158,7 +160,6 @@ const Login = () => {
       >
         Login with Facebook
       </button>
-      
     </div>
   );
 };
