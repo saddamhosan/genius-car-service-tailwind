@@ -11,14 +11,14 @@ const ServiceDetail = () => {
   const handleDeleteServices = (id) => {
     const proceed = window.confirm("are you sure you want to delete");
     if (proceed) {
-      fetch(`http://localhost:5000/services/${id}`, {
+      fetch(`https://agile-shore-59189.herokuapp.com/services/${id}`, {
         method: "DELETE",
       })
         .then((res) => res.json())
         .then((data) => {
-          if(data.deletedCount>0){
-            alert('delete successful')
-            navigate('/')
+          if (data.deletedCount > 0) {
+            alert("delete successful");
+            navigate("/");
           }
         });
     }

@@ -5,7 +5,7 @@ const AddServices = () => {
     const { register, handleSubmit } = useForm();
     const onSubmit = (data) =>{
         console.log(data);
-        const url = "http://localhost:5000/services";
+        const url = "https://agile-shore-59189.herokuapp.com/services";
         fetch(url,{
             method:'POST',
             headers:{'content-type':'application/json'},

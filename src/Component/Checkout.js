@@ -21,7 +21,7 @@ const handlePlaceOrder=e=>{
    address:e.target.address.value,
    phone:e.target.phone.value
  };
- axios.post("http://localhost:5000/order", order).then((res) => {
+ axios.post("https://agile-shore-59189.herokuapp.com/order", order).then((res) => {
    const {data}=res
    if(data.insertedId){
        toast('your order id booked')
