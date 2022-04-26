@@ -42,13 +42,19 @@ const Login = () => {
     setPassword(e.target.value);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await signInWithEmailAndPassword(email, password);
+  const getToken=async()=>{
     const { data } = await axios.post("https://agile-shore-59189.herokuapp.com/login", { email });
     console.log(data);
     localStorage.setItem("accessToken", data.accessToken);
-    navigate(from, { replace: true });
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await signInWithEmailAndPassword(email, password);
+    // const { data } = await axios.post("https://agile-shore-59189.herokuapp.com/login", { email });
+    // console.log(data);
+    // localStorage.setItem("accessToken", data.accessToken);
+    // navigate(from, { replace: true });
   };
 
   const handleGoogleSignIn = async () => {
@@ -68,7 +74,8 @@ const Login = () => {
     toast("sent email");
   };
 
-  if (FBUser || GhUser || GgUser) {
+  if (user || FBUser || GhUser || GgUser) {
+    getToken()
     navigate(from, { replace: true });
   }
 

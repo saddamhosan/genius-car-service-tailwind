@@ -32,8 +32,14 @@ const Order = () => {
     },[user,navigate])
    
     return (
-        <div>
+        <div className='w-1/2 mx-auto mt-10'>
             <h1>your order :{order.length}</h1>
+            {
+              order.map(oder=><div key={oder._id}>
+                <p>{oder.email} : {oder.service}</p>
+
+              </div>)
+            }
         </div>
     );
 };

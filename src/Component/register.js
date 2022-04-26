@@ -1,9 +1,10 @@
+import axios from "axios";
 import React, { useState } from "react";
 import {
   useCreateUserWithEmailAndPassword,
   useUpdateProfile
 } from "react-firebase-hooks/auth";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import auth from "./../firebase.init";
 import Spinners from "./Spinners";
 
@@ -15,6 +16,8 @@ const Register = () => {
   const [mistake, setMistake] = useState("");
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location?.state?.from?.pathname || "/";
 
   const [createUserWithEmailAndPassword, user, loading, error] =
   useCreateUserWithEmailAndPassword(auth ,{sendEmailVerification:true});
@@ -39,6 +42,15 @@ const Register = () => {
     return <Spinners/>
   }
 
+  const getToken = async () => {
+    const { data } = await axios.post(
+      "https://agile-shore-59189.herokuapp.com/login",
+      { email }
+    );
+    console.log(data);
+    localStorage.setItem("accessToken", data.accessToken);
+  };
+
   const handleSubmit = async(e) => {
     setMistake("");
     e.preventDefault();
@@ -48,7 +60,8 @@ const Register = () => {
     }
    await createUserWithEmailAndPassword(email, password);
    await updateProfile({ displayName: name });
-    navigate("/");
+   getToken()
+    navigate(from, { replace: true });
   };
   console.log(user);
 
@@ -107,7 +120,11 @@ const Register = () => {
         </div>
         <p className="text-red-600">{mistake}</p>
         {/* {loading && <p className="text-blue-600">loading...</p>} */}
-        {error && <p className="text-red-600">{error.message}</p>}
+        {(error || updateError) && (
+          <p className="text-red-600">
+            {error?.message} {updateError?.message}
+          </p>
+        )}
         <div className="flex justify-center">
           <input
             className="bg-blue-600 text-xl font-bold px-5 py-2 text-white rounded-xl mt-2"
