@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { useState } from "react";
 import {
   useSendPasswordResetEmail,
@@ -11,6 +10,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import auth from "../firebase.init";
+import useToken from "../Hooks/useToken";
 import Spinners from "./Spinners";
 
 const Login = () => {
@@ -22,6 +22,8 @@ const Login = () => {
 
   const [signInWithEmailAndPassword, user, loading, error] =
     useSignInWithEmailAndPassword(auth);
+
+   
 
   const [signInWithGoogle, GgUser, GgLoading, GgError] =
     useSignInWithGoogle(auth);
@@ -35,18 +37,14 @@ const Login = () => {
   const [sendPasswordResetEmail, sending, ResetPassError] =
     useSendPasswordResetEmail(auth);
 
+     const [token] = useToken(user|| GgUser||GhUser||FBUser);
+
   const handleEmail = (e) => {
     setEmail(e.target.value);
   };
   const handlePassword = (e) => {
     setPassword(e.target.value);
   };
-
-  const getToken=async()=>{
-    const { data } = await axios.post("https://agile-shore-59189.herokuapp.com/login", { email });
-    console.log(data);
-    localStorage.setItem("accessToken", data.accessToken);
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -74,8 +72,12 @@ const Login = () => {
     toast("sent email");
   };
 
-  if (user || FBUser || GhUser || GgUser) {
-    getToken()
+  
+
+  // if (user || FBUser || GhUser || GgUser) {
+  // }
+
+  if (token) {
     navigate(from, { replace: true });
   }
 

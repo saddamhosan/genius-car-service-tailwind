@@ -1,10 +1,10 @@
-import axios from "axios";
 import React, { useState } from "react";
 import {
   useCreateUserWithEmailAndPassword,
   useUpdateProfile
 } from "react-firebase-hooks/auth";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import useToken from "../Hooks/useToken";
 import auth from "./../firebase.init";
 import Spinners from "./Spinners";
 
@@ -21,6 +21,8 @@ const Register = () => {
 
   const [createUserWithEmailAndPassword, user, loading, error] =
   useCreateUserWithEmailAndPassword(auth ,{sendEmailVerification:true});
+
+  const [token]=useToken(user)
 
   const [updateProfile, updating, updateError] = useUpdateProfile(auth);
   
@@ -42,14 +44,14 @@ const Register = () => {
     return <Spinners/>
   }
 
-  const getToken = async () => {
-    const { data } = await axios.post(
-      "https://agile-shore-59189.herokuapp.com/login",
-      { email }
-    );
-    console.log(data);
-    localStorage.setItem("accessToken", data.accessToken);
-  };
+  // const getToken = async () => {
+  //   const { data } = await axios.post(
+  //     "https://agile-shore-59189.herokuapp.com/login",
+  //     { email }
+  //   );
+  //   console.log(data);
+  //   localStorage.setItem("accessToken", data.accessToken);
+  // };
 
   const handleSubmit = async(e) => {
     setMistake("");
@@ -60,11 +62,12 @@ const Register = () => {
     }
    await createUserWithEmailAndPassword(email, password);
    await updateProfile({ displayName: name });
-   getToken()
-    navigate(from, { replace: true });
+   
+    // navigate(from, { replace: true });
   };
-  console.log(user);
-
+if(token){
+  navigate(from, { replace: true });
+}
   
   return (
     <div className="w-1/3 mx-auto border-2 my-5 p-10 rounded-xl">
